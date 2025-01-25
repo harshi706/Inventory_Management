@@ -1,23 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Inventory = () => {
-  const [items, setItems] = useState([
-    {id: 1, name: "Apples", category: "Fruits", quantity: 8, price: 5 },
-    {id: 2, name: "Bananas", category: "Fruits", quantity: 20, price: 3 },
-    {id: 3,name: "Laptops",category: "Electronics",quantity: 5,price: 800,},
-    {id: 4,name: "Notebooks",category: "Stationery",quantity: 15,price: 2,},
-    {id: 5, name: "Chairs", category: "Furniture", quantity: 2, price: 50 },
-  ]);
+  const [items, setItems] = useState(() => {
+    // Load data from localStorage or use initial data
+    const savedItems = localStorage.getItem("inventory");
+    return savedItems
+      ? JSON.parse(savedItems)
+      : [
+          { id: 1, name: "Apples", category: "Fruits", quantity: 8, price: 5 },
+          { id: 2, name: "Bananas", category: "Fruits", quantity: 20, price: 3 },
+          { id: 3, name: "Laptops", category: "Electronics", quantity: 5, price: 800 },
+          { id: 4, name: "Notebooks", category: "Stationery", quantity: 15, price: 2 },
+          { id: 5, name: "Chairs", category: "Furniture", quantity: 2, price: 50 },
+        ];
+  });
 
   const [filter, setFilter] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
-  const [newItem, setNewItem] = useState({
-    name: "",
-    category: "",
-    quantity: "",
-    price: "",
-  });
+  const [newItem, setNewItem] = useState({ name: "", category: "", quantity: "", price: "" });
   const [editingItem, setEditingItem] = useState(null);
+
+  // Save items to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("inventory", JSON.stringify(items));
+  }, [items]);
 
   const handleAddItem = () => {
     if (newItem.name && newItem.category && newItem.quantity && newItem.price) {
@@ -41,11 +47,7 @@ const Inventory = () => {
 
   const handleSort = () => {
     setSortAsc(!sortAsc);
-    setItems(
-      [...items].sort((a, b) =>
-        sortAsc ? b.quantity - a.quantity : a.quantity - b.quantity
-      )
-    );
+    setItems([...items].sort((a, b) => (sortAsc ? b.quantity - a.quantity : a.quantity - b.quantity)));
   };
 
   const handleEditClick = (item) => {
@@ -54,7 +56,11 @@ const Inventory = () => {
 
   const handleSaveEdit = (id) => {
     setItems(
-      items.map((item) => (item.id === id ? { ...item, ...editingItem } : item))
+      items.map((item) =>
+        item.id === id
+          ? { ...item, ...editingItem }
+          : item
+      )
     );
     setEditingItem(null);
   };
@@ -64,13 +70,12 @@ const Inventory = () => {
   };
 
   const filteredItems = filter
-    ? items.filter(
-        (item) => item.category.toLowerCase() === filter.toLowerCase()
-      )
+    ? items.filter((item) => item.category.toLowerCase() === filter.toLowerCase())
     : items;
 
   return (
     <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Inventory Management</h1>
       <div className="flex gap-4 mb-4">
         <input
           type="text"
@@ -132,7 +137,7 @@ const Inventory = () => {
           {filteredItems.map((item) => (
             <tr
               key={item.id}
-              className={item.quantity < 10 ? "bg-blue-100" : ""}
+              className={item.quantity < 10 ? "bg-red-100" : ""}
             >
               <td className="border p-2">
                 {editingItem?.id === item.id ? (
