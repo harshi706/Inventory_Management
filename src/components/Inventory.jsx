@@ -2,11 +2,8 @@ import React, { useState, useEffect } from "react";
 
 const Inventory = () => {
   const [items, setItems] = useState(() => {
-    // Load data from localStorage or use initial data
     const savedItems = localStorage.getItem("inventory");
-    return savedItems
-      ? JSON.parse(savedItems)
-      : [
+    return savedItems ? JSON.parse(savedItems) : [
           { id: 1, name: "Apples", category: "Fruits", quantity: 8, price: 5 },
           { id: 2, name: "Bananas", category: "Fruits", quantity: 20, price: 3 },
           { id: 3, name: "Laptops", category: "Electronics", quantity: 5, price: 800 },
@@ -20,7 +17,6 @@ const Inventory = () => {
   const [newItem, setNewItem] = useState({ name: "", category: "", quantity: "", price: "" });
   const [editingItem, setEditingItem] = useState(null);
 
-  // Save items to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("inventory", JSON.stringify(items));
   }, [items]);
